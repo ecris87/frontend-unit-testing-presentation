@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>Unit testing with Mocha, Sinon and Chai</title>
+
+    <meta name="description" content="A quick overview of testing with mocha, sinon and chai">
+    <meta name="author" content="Emilia Cristea">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/simple.css" id="theme">
+
+    <!-- Code syntax highlighting -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+        document.getElementsByTagName('head')[0].appendChild(link);
+    </script>
+
+    <!-- All links should open in a new tab -->
+    <base target="_blank">
+
+    <style>
+        .reveal .slides section li {
+            margin: 20px 0;
+        }
+
+        .reveal section img {
+            background: none;
+            border: 0 none;
+            box-shadow: none;
+        }
+
+        .reveal h2 {
+            text-transform: uppercase;
+        }
+
+        .reveal pre {
+            width: 100%;
+        }
+
+        .reveal pre code.hj-code {
+            font-size: 16px;
+            max-height: 600px;
+            padding-left: 20px;
+        }
+
+        .reveal pre code mark {
+            font-weight: bold;
+        }
+
+        .reveal div.circle-container {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .reveal sup {
+            font-size: 22px;
+        }
+
+        .reveal div.circle-container div.circle {
+            margin: 30px;
+            width: 410px;
+            height: 200px;
+            line-height: 200px;
+            border-radius: 50%;
+            font-size: 30px;
+            color: #ffffff;
+            text-align: center;
+            background: #42b9f4;
+        }
+
+        .reveal div.circle-container div:nth-child(2) {
+            background: #24b58e;
+        }
+
+        .reveal div.circle-container div:nth-child(3) {
+            background: #b5246a;
+        }
+
+        .reveal div.circle-container div:nth-child(4) {
+            background: #2437b5;
+        }
+
+        .reveal header {
+            font-size: 22px;
+            font-style: italic;
+            color: #fff;
+            text-shadow: 1px 1px #000;
+        }
+
+        .reveal .visible-note {
+            font-size: 16px;
+        }
+
+        .reveal .inner-container-center {
+            display: table-cell; vertical-align: middle; width: 50%;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="reveal">
+
+    <div class="slides">
+        <header id="slide-header"></header>
+
+        <!------------------------##################--------------------------->
+        <section title="unit testing the frontend" id="home" data-background-color="#8EDBE5">
+            <h1>Unit Testing The Frontend</h1>
+            <aside class="notes">
+                - Unit tests exist to test individual units of software functionality. A unit is a module, component, or
+                function. They’re bits of the program that can work independently of the rest of the program. The
+                presence of unit testing implies that the software is designed in a modular fashion.
+            </aside>
+        </section>
+
+
+        <!------------------------##################--------------------------->
+        <section title="about the talk" data-background-color="#8EDBE5">
+            <section>
+                <h3>This is what we'll cover:</h3>
+                <ol>
+                    <li>Why spend time writing unit tests?</li>
+                    <li>Why unit test the frontend?</li>
+                    <li>Tips for writing testable code</li>
+                    <li>Tips for writing tests</li>
+                    <li>Tooling: frameworks, libraries and more</li>
+                </ol>
+            </section>
+        </section>
+
+
+        <!------------------------##################--------------------------->
+        <section title="why spend time writing unit tests" data-background-color="#8EDBE5">
+            <section>
+                <h2>Why spend time writing unit tests?</h2>
+            </section>
+
+            <section data-header="Why spend time writing unit tests?">
+                <p>So you can change code with confidence. You know what works and what shouldn't. You don't fear
+                    refactoring in an area covered by unit tests.
+                </p>
+                <aside class="notes">
+                    - Refactoring with confidence is the best! Without unit tests, it is often hard to ensure the you
+                    didn't break anything.<br>
+                    - You might not need unit testing for code you recently wrote, but when someone else comes in and
+                    modifies it without a full understanding, it can catch a lot of the silly mistakes they might make.
+                </aside>
+            </section>
+
+            <section data-header="Why spend time writing unit tests?">
+                <p>Tests aid you in understanding and covering requirements... especially if you start by writing
+                    tests - see <a target="_self" href="http://blog.cleancoder.com/uncle-bob/2014/12/17/TheCyclesOfTDD.html">TDD</a>.
+                </p>
+                <aside class="notes">
+                    - The philosophy is based on the idea that our limited minds are not capable of pursuing the two
+                    simultaneous goals of all software systems: 1. Correct behavior. 2. Correct structure. So the
+                    RGR cycle tells us to first focus on making the software work correctly; and then, and only
+                    then, to focus on giving that working software a long-term survivable structure.
+                </aside>
+            </section>
+
+            <section data-header="Why spend time writing unit tests?">
+                <p>Tests aid you in finding flaws in your code or even in your design.</p>
+                <aside class="notes">
+                    - <a href="http://blog.cleancoder.com/uncle-bob/2016/03/19/GivingUpOnTDD.html">Good designs are easy
+                    to test</a>
+                </aside>
+            </section>
+
+            <section style="display: table;" data-header="Why spend time writing unit tests?">
+                <div class="inner-container-center">
+                    <p>Tests can also serve as documentation (especially if you write them with
+                        <a href="https://en.wikipedia.org/wiki/Behavior-driven_development#Behavioral_specifications">BDD</a>
+                        style assertions).</p>
+                    <br>
+                    <p>Plus, they don't go out-of-date, unlike separate documentation, which can and frequently does.</p>
+                </div>
+                <div class="inner-container-center">
+                    <img width="300" src="http://www.datamation.com/img/2009/12/documentation-please.jpg" alt="documentation">
+                </div>
+            </section>
+
+            <section data-header="Why spend time writing unit tests?">
+                <p>Testing is fun. (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧</p><br>
+                <img src="https://mochajs.org/images/reporter-nyan.png" alt="nyan mocha">
+                <aside class="notes">
+                    - When writing tests you place yourself on the other side, as if you are playing chess against
+                    yourself.<br>
+                    - Writing tests that fail and then make them go green is rewarding. Instant visual feedback!
+                </aside>
+            </section>
+
+        </section>
+
+
+        <!------------------------##################--------------------------->
+        <section title="why unit test the frontend" data-background-color="#8EDBE5">
+            <section>
+                <h2>Why unit test the frontend?</h2>
+            </section>
+
+            <section data-header="Why unit test the frontend?">
+                <p>Because it's a good idea to write unit tests, and because we can.<br> ｡◕‿◕｡</p>
+            </section>
+            <section data-header="Why unit test the frontend?">
+                <p>The days of untestable spaghetti code on the client are gone (thanks frameworks!)</p>
+                <img style="width: 650px;" src="https://www.future-processing.com/blog/wp-content/uploads/2015/11/Frameworks-Future-Processing.jpg" alt="frameworks lol">
+            </section>
+        </section>
+
+
+        <!------------------------##################--------------------------->
+        <section title="tips for writing testable code" data-background-color="#8EDBE5">
+            <section>
+                <h2>Tips for writing testable code</h2>
+            </section>
+
+            <section data-header="Tips for writing testable code">
+                <p>Divide and conquer.</p>
+                <p>Split and isolate business logic from UI logic.</p>
+            </section>
+            <section data-header="Tips for writing testable code">
+                <p>Don't intermingle responsibilities.</p>
+                <div class="circle-container">
+                    <div class="circle">presentation & interaction</div>
+                    <div class="circle">data / server communication</div>
+                    <div class="circle">application state</div>
+                    <div class="circle">setup & glue code</div>
+                </div>
+                <aside class="visible-note">
+                    * See this concept explained in more detail here:
+                    <a href="http://alistapart.com/article/writing-testable-javascript">Writing Testable Javascript</a>.
+                </aside>
+                <aside class="notes">
+                    <ol>
+                        <li>Presentation and interaction</li>
+                        <li>Data management and persistence</li>
+                        <li>Overall application state</li>
+                        <li>Setup and glue code to make the pieces work together</li>
+                    </ol>
+                </aside>
+            </section>
+            <section data-header="Tips for writing testable code">
+                Instead of using anonymous functions as event handlers, use named functions that can be tested.
+            </section>
+            <section data-header="Tips for writing testable code">
+                <p>Write small functions instead of one big one. Small functions are easier to test.</p>
+                <p class="fragment" data-fragment-index="0">
+                    However, don't go to overboard on this, make sure your functions extractions make sense from a
+                    separations of concerns perspective - you don't want to ruin the design just to make it easier to
+                    test.
+                </p>
+                <aside class="notes">
+                    - Check out MPJ's <a href="https://youtu.be/0ZNIQOO2sfA?t=723">Separations of Concerns Rant</a>
+                </aside>
+            </section>
+            <section data-header="Tips for writing testable code">
+                Use <a href="http://www.nicoespeon.com/en/2015/01/pure-functions-javascript/">pure functions</a>. The
+                more you break your problems down into simple, pure functions, the easier it will be to test your code
+                without mocks.
+                <aside class="notes">
+                    - A pure function always returns the same result given the same parameters and it does not produce
+                    any side-effects (does not modify state outside of its scope).
+                </aside>
+            </section>
+        </section>
+
+        <!------------------------##################--------------------------->
+        <section title="tips for writing tests" data-background-color="#8EDBE5">
+            <section>
+                <h2>Tips for writing tests</h2>
+            </section>
+
+            <section data-header="Tips for writing tests">
+                <p>If you're working on a new feature and you don't know where to start... </p>
+                <p class="fragment" data-fragment-index="0">
+                    Start by writing unit tests. You don't necessarily need to fill them out, setting up the basic
+                    structure can help you figure out what you need to do and start coding.
+                </p>
+                <p class="fragment" data-fragment-index="1">
+                    This is a way to get some of the benefits of TDD, without fully committing to it ;)
+                </p>
+                <aside class="notes">
+                    - Unit Tests help you really understand the design of the code you are working on. <br>
+                    - Instead of writing code to do something, you are starting by outlining all the conditions you are
+                    subjecting the code to and what outputs you'd expect from that.
+                </aside>
+            </section>
+            <section data-header="Tips for writing tests">
+                If you're working on fixing a bug, write a test case to confirm it. Then fix it and make the test pass.
+            </section>
+            <section data-header="Tips for writing tests">
+                <p>A good unit test is very limited in scope. If the test fails, it's obvious where to look for the
+                problem.</p>
+                <p>Use as few assertions as possible so that the offending code is obvious. It's important to only
+                test one thing in a single test.</p>
+            </section>
+            <section data-header="Tips for writing tests">
+                <p>Don’t test what has been tested already: meaning don't test what the framework / library you use do
+                    out of the box.</p>
+                <p>Test domain specific stuff, like business rules, etc. Tests should be relevant and meaningful.</p>
+            </section>
+            <section data-header="Tips for writing tests">
+                If you find that it’s hard to write unit tests for your views/models without mocking lots of other
+                things, that may be a sign that your program is not modular enough. Tests can reveal tight coupling (the
+                opposite of modularity).
+            </section>
+            <section data-header="Tips for writing tests">
+                Don't forget to do negative testing! <br>Think "what can go wrong with the code i just wrote".
+                <aside class="notes">
+                    - Negative testing: invalid input.
+                </aside>
+            </section>
+            <section data-header="Tips for writing tests">
+                <p>Beware of false positives. <br> This might not be a problem in server-side unit testing frameworks,
+                <a href="https://github.com/moll/js-must#asserting-on-property-access">but it is one in Mocha</a>
+                for example (due to the way JavaScript works).</p>
+                <p>However there are <a href="https://www.npmjs.com/package/dirty-chai">solutions</a> out there.</p>
+            </section>
+            <section data-header="Tips for writing tests">
+                <p>Don't give up! <br>Preexisting code created without tests can be challenging to test/refactor, but with
+                incremental effort, it can be done.</p>
+                <img width="300" src="http://s2.quickmeme.com/img/1a/1af33bbe837b9b1d65c9ac632afc856f90796618695ce6561dfb09387fefac18.jpg" alt="cat">
+            </section>
+            <section data-header="Tips for writing tests">
+                <p>If you find something that is hard to test, see if it can be refactored.</p>
+                <p>Improving code quality can be a nice side-effect of unit testing.</p>
+            </section>
+        </section>
+
+
+        <!------------------------##################--------------------------->
+        <section title="final quote" data-background-color="#8EDBE5">
+            <section>
+                <p>Aim for good code coverage and well-written tests, but don't let yourself become overly concerned
+                    with them.</p>
+                <p>After all...</p>
+            </section>
+            <section>
+                <blockquote>
+                    "Imperfect tests, run frequently, are much better than perfect tests that are never written at all". -
+                    Martin Fowler
+                </blockquote>
+            </section>
+        </section>
+    </div>
+
+</div>
+
+<script src="lib/js/head.min.js"></script>
+<script src="js/reveal.js"></script>
+
+<script>
+
+    // Full list of configuration options available at:
+    // https://github.com/hakimel/reveal.js#configuration
+    Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+        slideNumber: 'c/t',
+        viewDistance: 5,
+
+        transition: 'concave', // none/fade/slide/convex/concave/zoom
+
+        // Optional reveal.js plugins
+        dependencies: [
+            {
+                src: 'lib/js/classList.js', condition: function() {
+                return !document.body.classList;
+            }
+            },
+            {
+                src: 'plugin/markdown/marked.js', condition: function() {
+                return !!document.querySelector('[data-markdown]');
+            }
+            },
+            {
+                src: 'plugin/markdown/markdown.js', condition: function() {
+                return !!document.querySelector('[data-markdown]');
+            }
+            },
+            {
+                src: 'plugin/highlight/highlight.js', async: true, callback: function() {
+                hljs.initHighlightingOnLoad();
+            }
+            },
+            {src: 'plugin/zoom-js/zoom.js', async: true},
+            {src: 'plugin/notes/notes.js', async: true}
+        ]
+    });
+
+    var myHeader = document.querySelector('#slide-header');
+    Reveal.addEventListener('slidechanged', function(event) {
+        // event.previousSlide, event.currentSlide, event.indexh, event.indexv
+        if(event.currentSlide.dataset.header) {
+            myHeader.innerHTML = event.currentSlide.dataset.header;
+        } else {
+            myHeader.innerHTML = '';
+        }
+    });
+
+</script>
+
+</body>
+</html>
